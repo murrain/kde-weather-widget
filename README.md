@@ -18,35 +18,20 @@ A KDE Plasma 6 applet that displays live weather conditions from an OpenWeatherM
 ## Requirements
 
 - KDE Plasma 6
-- An OpenWeatherMap API key, **or** any OWM One Call compatible endpoint
+- An OpenWeatherMap API key — get one free at [openweathermap.org](https://openweathermap.org/api)
 
 ---
 
 ## Install
 
-**1. Clone the repo**
-
 ```sh
 git clone https://github.com/murrain/kde-weather-widget.git
 cd kde-weather-widget
-```
-
-**2. Copy the widget into Plasma's plasmoids directory**
-
-```sh
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
 ```
 
-**3. Restart Plasma**
-
-```sh
-plasmashell --replace &disown
-```
-
-**4. Add the widget to your panel**
-
-Right-click your panel → **Add Widgets** → search for **Weather Station** → drag it onto the panel.
+Then right-click your panel → **Add Widgets** → search **Weather Station**.
 
 ---
 
@@ -58,8 +43,8 @@ Right-click the widget → **Configure**.
 
 | Setting | Notes |
 |---|---|
-| API provider | Choose OpenWeatherMap One Call 3.0, 2.5 (legacy), or Custom URL |
-| API key | Required for OWM presets — get one at [openweathermap.org](https://openweathermap.org/api) |
+| API provider | OpenWeatherMap One Call 3.0, 2.5 (legacy), or Custom URL |
+| API key | Your OpenWeatherMap API key |
 | Location search | Type a city or region and hit Search — click a result to save it |
 | Enter coordinates manually | Toggle on to type lat/lon directly instead of searching |
 | Override display name | Optional — replaces the location name shown in the popup header |
@@ -79,9 +64,8 @@ Right-click the widget → **Configure**.
 
 ## Updating
 
-After pulling new changes:
-
 ```sh
+git pull
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
 plasmashell --replace &disown
