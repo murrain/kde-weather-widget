@@ -37,7 +37,6 @@ PlasmoidItem {
         : "--"
 
     property string locationName: Plasmoid.configuration.locationName
-        || Plasmoid.configuration.locationDisplay
         || (weatherData && weatherData.name ? weatherData.name : "")
         || "Weather Station"
 
