@@ -60,7 +60,7 @@ Kirigami.FormLayout {
     TextField {
         id: endpointField
         Kirigami.FormData.label: i18n("API endpoint:")
-        placeholderText: "http://host/data/3.0/onecall"
+        placeholderText: "https://api.openweathermap.org/data/3.0/onecall"
         Layout.minimumWidth: Kirigami.Units.gridUnit * 22
         visible: !isOwm
     }

@@ -6,7 +6,7 @@
 
     <group name="General">
         <entry name="apiPreset" type="String">
-            <default>custom</default>
+            <default>owm30</default>
         </entry>
         <entry name="apiKey" type="String">
             <default></default>
@@ -21,7 +21,7 @@
             <default></default>
         </entry>
         <entry name="apiEndpoint" type="String">
-            <default>http://192.168.8.30:8002/data/3.0/onecall</default>
+            <default></default>
         </entry>
         <entry name="locationName" type="String">
             <default></default>

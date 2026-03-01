@@ -94,7 +94,7 @@ PlasmoidItem {
             url = "https://api.openweathermap.org/data/" + ver + "/onecall"
                 + "?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=metric"
         } else {
-            var endpoint = Plasmoid.configuration.apiEndpoint || "http://192.168.8.30:8002/data/3.0/onecall"
+            var endpoint = Plasmoid.configuration.apiEndpoint || ""
             var sep      = endpoint.indexOf("?") >= 0 ? "&" : "?"
             url          = endpoint + sep + "units=metric"
         }
