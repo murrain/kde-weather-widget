@@ -124,10 +124,11 @@ PlasmoidItem {
 
         requestJson(url, 15000, {}, function (parsed) {
             var normalized = normalizeWeatherData(parsed, provider)
-            if (!normalized || !normalized.current || !normalized.current.weather) {
+            var missing = validateNormalizedWeatherData(normalized)
+            if (missing.length > 0) {
                 loading = false
                 weatherData = null
-                errorMsg = "Response format is missing required weather fields."
+                errorMsg = "Response format error from " + providerLabel(provider) + ". Missing fields: " + missing.join(", ") + "."
                 return
             }
             loading = false
@@ -138,36 +139,40 @@ PlasmoidItem {
             loading = false
             weatherData = null
             errorMsg = msg
-        })
+        }, providerLabel(provider))
     }
 
-    function requestJson(url, timeoutMs, headers, onSuccess, onError) {
+    function requestJson(url, timeoutMs, headers, onSuccess, onError, sourceLabel) {
         var xhr = new XMLHttpRequest()
         xhr.open("GET", url)
         xhr.timeout = timeoutMs || 15000
+        var source = sourceLabel && trimmed(sourceLabel) !== ""
+            ? sourceLabel
+            : "Weather provider"
+        var sourceWithUrl = source + " (" + shortUrl(url) + ")"
         for (var key in headers) {
             if (headers.hasOwnProperty(key)) xhr.setRequestHeader(key, headers[key])
         }
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== XMLHttpRequest.DONE) return
             if (xhr.status !== 200) {
-                onError(httpErrorMessage(xhr.status, xhr.responseText))
+                onError(sourceWithUrl + ": " + httpErrorMessage(xhr.status, xhr.responseText))
                 return
             }
             try {
                 onSuccess(JSON.parse(xhr.responseText))
             } catch (e) {
                 var preview = String(xhr.responseText || "").replace(/\s+/g, " ").slice(0, 120)
-                var msg = "Could not parse weather response from " + shortUrl(url) + "."
+                var msg = "Could not parse weather response from " + sourceWithUrl + "."
                 if (preview) msg += " Response starts with: " + preview
                 onError(msg)
             }
         }
         xhr.onerror = function () {
-            onError("Network error while contacting weather provider.")
+            onError(sourceWithUrl + ": network error while contacting provider.")
         }
         xhr.ontimeout = function () {
-            onError("Weather request timed out after " + Math.round((timeoutMs || 15000) / 1000) + " seconds.")
+            onError(sourceWithUrl + ": request timed out after " + Math.round((timeoutMs || 15000) / 1000) + " seconds.")
         }
         xhr.send()
     }
@@ -203,7 +208,7 @@ PlasmoidItem {
             if (!hourlyUrl || !dailyUrl) {
                 loading = false
                 weatherData = null
-                errorMsg = "weather.gov points response did not include forecast URLs."
+                errorMsg = "weather.gov points response is missing forecast URLs. weather.gov supports US coordinates only."
                 return
             }
 
@@ -220,20 +225,21 @@ PlasmoidItem {
             loading = false
             weatherData = null
             if (msg.indexOf("(404)") >= 0)
-                errorMsg = "weather.gov has no forecast coverage for this location."
+                errorMsg = "weather.gov has no forecast coverage for this location. weather.gov supports US coordinates only."
             else
-                errorMsg = "weather.gov points lookup error: " + msg
-        })
+                errorMsg = "weather.gov points lookup error. Use US coordinates. Details: " + msg
+        }, "weather.gov points")
     }
 
     function fetchWeatherGovForecasts(hourlyUrl, dailyUrl, city, state, headers) {
         requestJson(hourlyUrl, 15000, headers, function (hourly) {
             requestJson(dailyUrl, 15000, headers, function (daily) {
                 var normalized = normalizeWeatherGov(hourly, daily, city, state)
-                if (!normalized || !normalized.current || !normalized.daily || normalized.daily.length === 0) {
+                var missing = validateNormalizedWeatherData(normalized)
+                if (missing.length > 0) {
                     loading = false
                     weatherData = null
-                    errorMsg = "weather.gov response format is missing required weather fields."
+                    errorMsg = "weather.gov response format error. Missing fields: " + missing.join(", ") + "."
                     return
                 }
                 loading = false
@@ -244,12 +250,12 @@ PlasmoidItem {
                 loading = false
                 weatherData = null
                 errorMsg = "weather.gov daily forecast error: " + msg
-            })
+            }, "weather.gov daily")
         }, function (msg) {
             loading = false
             weatherData = null
             errorMsg = "weather.gov hourly forecast error: " + msg
-        })
+        }, "weather.gov hourly")
     }
 
     function validateProviderConfig(provider) {
@@ -308,6 +314,34 @@ PlasmoidItem {
         if (provider.parser === "owm_onecall") return normalizeOwmOneCall(raw)
         if (provider.parser === "owm_compatible") return normalizeOwmCompatible(raw)
         return null
+    }
+
+    function validateNormalizedWeatherData(data) {
+        var missing = []
+        if (!data || typeof data !== "object") {
+            missing.push("root")
+            return missing
+        }
+        if (!data.current || typeof data.current !== "object") missing.push("current")
+        if (!data.daily || !data.daily.length) missing.push("daily[0]")
+
+        var current = data.current || {}
+        if (current.temp === undefined || current.temp === null || isNaN(Number(current.temp))) missing.push("current.temp")
+        if (!current.weather || !current.weather.length) {
+            missing.push("current.weather[0]")
+        } else {
+            if (!current.weather[0].icon) missing.push("current.weather[0].icon")
+            if (!current.weather[0].description) missing.push("current.weather[0].description")
+        }
+
+        var day0 = (data.daily && data.daily.length > 0) ? data.daily[0] : null
+        if (!day0 || !day0.temp) {
+            missing.push("daily[0].temp")
+        } else {
+            if (day0.temp.max === undefined || day0.temp.max === null || isNaN(Number(day0.temp.max))) missing.push("daily[0].temp.max")
+            if (day0.temp.min === undefined || day0.temp.min === null || isNaN(Number(day0.temp.min))) missing.push("daily[0].temp.min")
+        }
+        return missing
     }
 
     function normalizeOwmOneCall(raw) {
@@ -592,6 +626,10 @@ PlasmoidItem {
         var noQuery = s.split("?")[0]
         if (noQuery.length <= 72) return noQuery
         return noQuery.slice(0, 69) + "..."
+    }
+
+    function providerLabel(provider) {
+        return provider && provider.label ? provider.label : "Weather provider"
     }
 
     function isFiniteNumber(v) {
