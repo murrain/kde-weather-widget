@@ -1,5 +1,7 @@
 # kde-weather-widget
 
+![Screenshot](screenshot.jpg)
+
 A KDE Plasma 6 applet that displays live weather conditions from an OpenWeatherMap-compatible API endpoint. Shows current temperature, conditions, wind, humidity, pressure, and visibility in the system tray and popup.
 
 ---
