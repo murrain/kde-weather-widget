@@ -1,0 +1,19 @@
+# KDE / Qt
+*.qmlc
+*.jsc
+.kdev4/
+*.kdev4
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+
+# Editor backups
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
