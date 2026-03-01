@@ -11,7 +11,8 @@
             {
                 "Name": "Patrick Smith"
             }
-        ]
+        ],
+        "Website": "https://github.com/murrain/kde-weather-widget"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
     "X-Plasma-NotificationAreaCategory": "SystemServices"
