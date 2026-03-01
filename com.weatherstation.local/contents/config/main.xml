@@ -6,7 +6,7 @@
 
     <group name="General">
         <entry name="apiPreset" type="String">
-            <default>owm30</default>
+            <default>openmeteo</default>
         </entry>
         <entry name="apiKey" type="String">
             <default></default>

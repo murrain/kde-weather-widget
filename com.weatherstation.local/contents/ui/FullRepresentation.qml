@@ -52,6 +52,16 @@ ColumnLayout {
         }
     }
 
+    PlasmaComponents.Label {
+        Layout.fillWidth: true
+        Layout.leftMargin: Kirigami.Units.largeSpacing
+        Layout.rightMargin: Kirigami.Units.largeSpacing
+        visible: dbg && root.fetchDebugMsg !== ""
+        text: root.fetchDebugMsg
+        font.pointSize: Kirigami.Theme.smallFont.pointSize
+        opacity: 0.55
+    }
+
     // ── Current: icon | temp+condition | stats ────────────────
     RowLayout {
         Layout.fillWidth: true

@@ -2,27 +2,32 @@
 
 ![Screenshot](screenshot.jpg)
 
-A KDE Plasma 6 applet that displays live weather conditions from an OpenWeatherMap-compatible API endpoint. Shows current temperature, conditions, wind, humidity, pressure, and visibility in the system tray and popup.
+A KDE Plasma 6 applet that shows current weather in the system tray and detailed conditions in the popup.
 
----
+The widget now defaults to **Open-Meteo** (no API key), so it can run immediately after setting a location.
 
-## What it does
+## Features
 
-- Sits in the system tray and shows the current temperature and a weather icon
-- Expands to a popup with full conditions: temperature, weather description, wind, humidity, pressure, and visibility
-- Supports OpenWeatherMap One Call 3.0, One Call 2.5 (legacy), or any compatible custom endpoint
-- Location search built in — type a city name and pick from results, no coordinates needed
-- Refreshes on a configurable interval (default 5 minutes)
-- Converts all units display-side — data is always requested in metric
-
----
+- Tray icon + current temperature
+- Expanded popup with:
+  - current temperature and condition
+  - feels-like, humidity, wind, pressure, visibility
+  - 7-day forecast with precipitation probability
+- Provider-based architecture:
+  - Open-Meteo (default, no API key)
+  - weather.gov (US National Weather Service, no API key)
+  - OpenWeatherMap One Call 3.0
+  - OpenWeatherMap One Call 2.5 (legacy)
+  - Custom OWM-compatible URL
+- Configurable units and decimal precision
+- Configurable refresh interval
+- Improved error handling for invalid config, network errors, timeouts, and API errors
 
 ## Requirements
 
 - KDE Plasma 6
-- An OpenWeatherMap API key — get one free at [openweathermap.org](https://openweathermap.org/api)
-
----
+- For `weather.gov` provider: a US location (NWS coverage)
+- Optional: OpenWeatherMap API key if you use OWM provider
 
 ## Install
 
@@ -33,36 +38,65 @@ rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherst
 kbuildsycoca6
 ```
 
-Then right-click your panel → **Add Widgets** → search **Weather Station**.
+Then add **Weather Station** from panel widgets.
 
----
+## First run (recommended)
+
+1. Right-click widget -> **Configure**.
+2. Keep provider as **Open-Meteo (No API key)**.
+3. Search for your city and select a result.
+4. Close config.
 
 ## Configuration
 
-Right-click the widget → **Configure**.
+### General tab
 
-**General tab**
+- **API provider**: Choose provider preset. `weather.gov` uses NWS public APIs via your selected coordinates.
+- **API key**: Shown only for providers that require a key.
+- **API endpoint**: Shown only for custom URL provider.
+- **Location search**: Available for providers that support geocoding.
+- **Manual coordinates**: Set lat/lon directly.
+- **Override display name**: Optional popup header override.
+- **Refresh interval**: 1-60 minutes.
+- **Temperature/Humidity decimal places**.
+- **Debug layout**: visual layout diagnostics.
 
-| Setting | Notes |
-|---|---|
-| API provider | OpenWeatherMap One Call 3.0, 2.5 (legacy), or Custom URL |
-| API key | Your OpenWeatherMap API key |
-| Location search | Type a city or region and hit Search — click a result to save it |
-| Enter coordinates manually | Toggle on to type lat/lon directly instead of searching |
-| Override display name | Optional — replaces the location name shown in the popup header |
-| Refresh interval | 1–60 minutes (default 5) |
-| Temperature / humidity decimal places | 0–2 |
+### Units tab
 
-**Units tab**
+- Temperature: `C`, `F`, `K`
+- Wind speed: `m/s`, `km/h`, `mph`, `knots`
+- Pressure: `hPa`, `inHg`, `mmHg`
+- Visibility: `km`, `mi`
 
-| Measurement | Options |
-|---|---|
-| Temperature | °C, °F, K |
-| Wind speed | m/s, km/h, mph, knots |
-| Pressure | hPa, inHg, mmHg |
-| Visibility | km, mi |
+## Error handling behavior
 
----
+The widget shows actionable errors for:
+
+- Missing or invalid location coordinates
+- Missing API key for key-based providers
+- Unsupported weather.gov location (outside NWS coverage)
+- Invalid custom endpoint URL
+- Network failures and timeouts
+- HTTP errors (401/403/404/429/5xx)
+- Invalid or incompatible JSON payloads
+
+## Adding or editing providers
+
+Provider definitions are centralized in:
+
+- `com.weatherstation.local/contents/ui/lib/Providers.js`
+
+To add a new provider:
+
+1. Add a new object to `list()` with `id`, `label`, `parser`, `description`, capability flags (`requiresApiKey`, `requiresEndpoint`, `requiresCoords`, `supportsGeocoding`), and `requestTemplate`.
+2. If response JSON format is new, add normalization logic in `com.weatherstation.local/contents/ui/main.qml` (`normalizeWeatherData` + parser function).
+
+Supported template tokens:
+
+- `{lat}`
+- `{lon}`
+- `{apiKey}`
+- `{endpoint}`
 
 ## Updating
 
@@ -70,25 +104,25 @@ Right-click the widget → **Configure**.
 git pull
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
-plasmashell --replace &disown
+plasmashell --replace & disown
 ```
 
----
+## Project layout
 
-## Files
-
-```
+```text
 com.weatherstation.local/
 ├── metadata.json
 └── contents/
     ├── config/
-    │   ├── main.xml               Config schema (KConfig XT)
-    │   └── config.qml             Config dialog tab definitions
+    │   ├── main.xml
+    │   └── config.qml
     └── ui/
-        ├── main.qml               Root plasmoid: data fetching, unit conversion
-        ├── CompactRepresentation.qml   System tray icon + temperature
-        ├── FullRepresentation.qml      Popup with full conditions
+        ├── lib/
+        │   └── Providers.js
+        ├── main.qml
+        ├── CompactRepresentation.qml
+        ├── FullRepresentation.qml
         └── config/
-            ├── ConfigGeneral.qml  API provider, location search, precision, interval
-            └── ConfigUnits.qml    Per-measurement unit selectors
+            ├── ConfigGeneral.qml
+            └── ConfigUnits.qml
 ```
