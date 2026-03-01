@@ -27,7 +27,7 @@ function list() {
       requestTemplate:
         "https://api.open-meteo.com/v1/forecast" +
         "?latitude={lat}&longitude={lon}" +
-        "&current=temperature_2m,relative_humidity_2m,apparent_temperature,pressure_msl,wind_speed_10m,weather_code,is_day" +
+        "&current=temperature_2m,relative_humidity_2m,apparent_temperature,pressure_msl,wind_speed_10m,wind_direction_10m,weather_code,is_day" +
         "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
         "&timezone=auto&forecast_days=7&wind_speed_unit=ms",
     },

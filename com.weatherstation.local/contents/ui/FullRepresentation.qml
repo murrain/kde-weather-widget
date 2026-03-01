@@ -130,7 +130,7 @@ ColumnLayout {
             PlasmaComponents.Label { text: root.weatherData ? root.formatHumidity(root.weatherData.current.humidity) : "--"; font.pointSize: Kirigami.Theme.smallFont.pointSize }
 
             PlasmaComponents.Label { text: "Wind"; opacity: 0.55; font.pointSize: Kirigami.Theme.smallFont.pointSize }
-            PlasmaComponents.Label { text: root.weatherData ? root.formatWind(root.weatherData.current.wind_speed) : "--"; font.pointSize: Kirigami.Theme.smallFont.pointSize }
+            PlasmaComponents.Label { text: root.weatherData ? root.formatWindWithDirection(root.weatherData.current.wind_speed, root.weatherData.current.wind_deg) : "--"; font.pointSize: Kirigami.Theme.smallFont.pointSize }
 
             PlasmaComponents.Label { text: "Pressure"; opacity: 0.55; font.pointSize: Kirigami.Theme.smallFont.pointSize }
             PlasmaComponents.Label { text: root.weatherData ? root.formatPressure(root.weatherData.current.pressure) : "--"; font.pointSize: Kirigami.Theme.smallFont.pointSize }

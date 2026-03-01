@@ -355,6 +355,7 @@ PlasmoidItem {
                 humidity: raw.current.relative_humidity_2m,
                 pressure: raw.current.pressure_msl,
                 wind_speed: raw.current.wind_speed_10m,
+                wind_deg: raw.current.wind_direction_10m,
                 dew_point: null,
                 visibility: null,
                 weather: [cw]
@@ -431,6 +432,7 @@ PlasmoidItem {
                 humidity: null,
                 pressure: null,
                 wind_speed: currentWindMps,
+                wind_deg: parseWindDirectionToDegrees(currentPeriod.windDirection),
                 dew_point: null,
                 visibility: null,
                 weather: [currentWeather],
@@ -474,6 +476,31 @@ PlasmoidItem {
         if (s.indexOf("kt") >= 0 || s.indexOf("knot") >= 0) return avg * 0.514444
         if (s.indexOf("mph") >= 0) return avg * 0.44704
         return avg
+    }
+
+    function parseWindDirectionToDegrees(direction) {
+        if (!direction) return null
+        var d = String(direction).toUpperCase().replace(/[^A-Z]/g, "")
+        if (!d || d === "VRB" || d === "VARIABLE") return null
+        var map = {
+            "N": 0,
+            "NNE": 22.5,
+            "NE": 45,
+            "ENE": 67.5,
+            "E": 90,
+            "ESE": 112.5,
+            "SE": 135,
+            "SSE": 157.5,
+            "S": 180,
+            "SSW": 202.5,
+            "SW": 225,
+            "WSW": 247.5,
+            "W": 270,
+            "WNW": 292.5,
+            "NW": 315,
+            "NNW": 337.5
+        }
+        return map.hasOwnProperty(d) ? map[d] : null
     }
 
     function weatherGovTextToWeather(shortForecast, isDay) {
@@ -626,6 +653,20 @@ PlasmoidItem {
         if (u === "mph") return Math.round(s * 2.237) + " mph"
         if (u === "knots") return Math.round(s * 1.944) + " knots"
         return Math.round(s) + " m/s"
+    }
+
+    function windDirectionArrow(degrees) {
+        if (degrees === undefined || degrees === null || isNaN(Number(degrees))) return ""
+        var arrows = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
+        var normalized = ((Number(degrees) % 360) + 360) % 360
+        var idx = Math.round(normalized / 45) % 8
+        return arrows[idx]
+    }
+
+    function formatWindWithDirection(speed, degrees) {
+        var wind = formatWind(speed)
+        var arrow = windDirectionArrow(degrees)
+        return arrow ? (wind + " " + arrow) : wind
     }
 
     function formatPressure(hpa) {
