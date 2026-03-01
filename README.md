@@ -4,24 +4,7 @@
 
 A KDE Plasma 6 applet that shows current weather in the system tray and detailed conditions in the popup.
 
-The widget now defaults to **Open-Meteo** (no API key), so it can run immediately after setting a location.
-
-## Features
-
-- Tray icon + current temperature
-- Expanded popup with:
-  - current temperature and condition
-  - feels-like, humidity, wind, pressure, visibility
-  - 7-day forecast with precipitation probability
-- Provider-based architecture:
-  - Open-Meteo (default, no API key)
-  - weather.gov (US National Weather Service, no API key)
-  - OpenWeatherMap One Call 3.0
-  - OpenWeatherMap One Call 2.5 (legacy)
-  - Custom OWM-compatible URL
-- Configurable units and decimal precision
-- Configurable refresh interval
-- Improved error handling for invalid config, network errors, timeouts, and API errors
+The default provider is **Open-Meteo** (no API key), so it works out of the box after you set a location.
 
 ## Requirements
 
@@ -29,23 +12,48 @@ The widget now defaults to **Open-Meteo** (no API key), so it can run immediatel
 - For `weather.gov` provider: a US location (NWS coverage)
 - Optional: OpenWeatherMap API key if you use OWM provider
 
-## Install
+## Quick start (step by step)
+
+1. Install the widget files:
+   ```sh
+   git clone https://github.com/murrain/kde-weather-widget.git
+   cd kde-weather-widget
+   rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
+   kbuildsycoca6
+   ```
+2. Add **Weather Station** from Plasma's widget picker.
+3. Right-click the widget -> **Configure**.
+4. Keep provider as **Open-Meteo (No API key)**.
+5. Search for your city, select it, then close the config dialog.
+
+## Update existing install
 
 ```sh
-git clone https://github.com/murrain/kde-weather-widget.git
-cd kde-weather-widget
+git pull
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
+plasmashell --replace & disown
 ```
 
-Then add **Weather Station** from panel widgets.
+If Plasma doesn't pick up the update immediately, log out/in or restart `plasmashell`.
 
-## First run (recommended)
+---
 
-1. Right-click widget -> **Configure**.
-2. Keep provider as **Open-Meteo (No API key)**.
-3. Search for your city and select a result.
-4. Close config.
+## More details
+
+### Features
+
+- Tray icon + current temperature
+- Expanded popup with current condition, feels-like, humidity, wind, pressure, visibility, and 7-day forecast
+- Multiple providers:
+  - Open-Meteo (default, no API key)
+  - weather.gov (US National Weather Service, no API key)
+  - OpenWeatherMap One Call 3.0
+  - OpenWeatherMap One Call 2.5 (legacy)
+  - Custom OWM-compatible URL
+- Configurable units and decimal precision
+- Configurable refresh interval
+- Error handling for invalid config, network errors, timeouts, and API errors
 
 ## Configuration
 
@@ -68,7 +76,7 @@ Then add **Weather Station** from panel widgets.
 - Pressure: `hPa`, `inHg`, `mmHg`
 - Visibility: `km`, `mi`
 
-## Error handling behavior
+### Error handling behavior
 
 The widget shows actionable errors for:
 
@@ -80,7 +88,7 @@ The widget shows actionable errors for:
 - HTTP errors (401/403/404/429/5xx)
 - Invalid or incompatible JSON payloads
 
-## Adding or editing providers
+### Adding or editing providers
 
 Provider definitions are centralized in:
 
@@ -98,16 +106,7 @@ Supported template tokens:
 - `{apiKey}`
 - `{endpoint}`
 
-## Updating
-
-```sh
-git pull
-rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
-kbuildsycoca6
-plasmashell --replace & disown
-```
-
-## Project layout
+### Project layout
 
 ```text
 com.weatherstation.local/
