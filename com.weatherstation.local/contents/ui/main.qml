@@ -157,7 +157,10 @@ PlasmoidItem {
             try {
                 onSuccess(JSON.parse(xhr.responseText))
             } catch (e) {
-                onError("Could not parse weather response.")
+                var preview = String(xhr.responseText || "").replace(/\s+/g, " ").slice(0, 120)
+                var msg = "Could not parse weather response from " + shortUrl(url) + "."
+                if (preview) msg += " Response starts with: " + preview
+                onError(msg)
             }
         }
         xhr.onerror = function () {
@@ -253,10 +256,15 @@ PlasmoidItem {
         if (!provider) return "No provider selected."
 
         if (provider.requiresCoords) {
-            var latOk = isValidLatitude(Plasmoid.configuration.latitude)
-            var lonOk = isValidLongitude(Plasmoid.configuration.longitude)
+            var latRaw = trimmed(Plasmoid.configuration.latitude)
+            var lonRaw = trimmed(Plasmoid.configuration.longitude)
+            if (!latRaw || !lonRaw)
+                return (provider.label || "Selected provider") + " requires a location. Open Configure → General and select a location first."
+
+            var latOk = isValidLatitude(latRaw)
+            var lonOk = isValidLongitude(lonRaw)
             if (!latOk || !lonOk)
-                return "Set a valid location first (latitude -90..90, longitude -180..180)."
+                return "Invalid location coordinates for " + (provider.label || "selected provider") + " (latitude -90..90, longitude -180..180)."
         }
 
         if (provider.requiresApiKey && !trimmed(Plasmoid.configuration.apiKey))
@@ -576,6 +584,14 @@ PlasmoidItem {
 
     function trimmed(v) {
         return String(v === undefined || v === null ? "" : v).trim()
+    }
+
+    function shortUrl(url) {
+        var s = trimmed(url)
+        if (!s) return "provider URL"
+        var noQuery = s.split("?")[0]
+        if (noQuery.length <= 72) return noQuery
+        return noQuery.slice(0, 69) + "..."
     }
 
     function isFiniteNumber(v) {
