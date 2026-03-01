@@ -31,6 +31,7 @@ PlasmoidItem {
         : "--"
 
     property string locationName: Plasmoid.configuration.locationName
+        || Plasmoid.configuration.locationDisplay
         || (weatherData && weatherData.name ? weatherData.name : "")
         || "Weather Station"
 
@@ -68,6 +69,10 @@ PlasmoidItem {
     Connections {
         target: Plasmoid.configuration
         function onApiEndpointChanged()    { fetchWeather() }
+        function onApiPresetChanged()      { fetchWeather() }
+        function onApiKeyChanged()         { fetchWeather() }
+        function onLatitudeChanged()       { fetchWeather() }
+        function onLongitudeChanged()      { fetchWeather() }
         function onUpdateIntervalChanged() {
             refreshTimer.interval = (Plasmoid.configuration.updateInterval || 5) * 60 * 1000
             refreshTimer.restart()
@@ -78,9 +83,21 @@ PlasmoidItem {
         loading  = true
         errorMsg = ""
 
-        var endpoint = Plasmoid.configuration.apiEndpoint || "http://192.168.8.30:8002/data/3.0/onecall"
-        var sep      = endpoint.indexOf("?") >= 0 ? "&" : "?"
-        var url      = endpoint + sep + "units=metric"
+        var preset = Plasmoid.configuration.apiPreset || "custom"
+        var url
+
+        if (preset === "owm30" || preset === "owm25") {
+            var lat = Plasmoid.configuration.latitude  || ""
+            var lon = Plasmoid.configuration.longitude || ""
+            var key = Plasmoid.configuration.apiKey    || ""
+            var ver = preset === "owm30" ? "3.0" : "2.5"
+            url = "https://api.openweathermap.org/data/" + ver + "/onecall"
+                + "?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=metric"
+        } else {
+            var endpoint = Plasmoid.configuration.apiEndpoint || "http://192.168.8.30:8002/data/3.0/onecall"
+            var sep      = endpoint.indexOf("?") >= 0 ? "&" : "?"
+            url          = endpoint + sep + "units=metric"
+        }
 
         var xhr = new XMLHttpRequest()
         xhr.open("GET", url)

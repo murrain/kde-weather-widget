@@ -5,6 +5,21 @@
       http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
 
     <group name="General">
+        <entry name="apiPreset" type="String">
+            <default>custom</default>
+        </entry>
+        <entry name="apiKey" type="String">
+            <default></default>
+        </entry>
+        <entry name="latitude" type="String">
+            <default></default>
+        </entry>
+        <entry name="longitude" type="String">
+            <default></default>
+        </entry>
+        <entry name="locationDisplay" type="String">
+            <default></default>
+        </entry>
         <entry name="apiEndpoint" type="String">
             <default>http://192.168.8.30:8002/data/3.0/onecall</default>
         </entry>
