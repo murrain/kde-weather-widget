@@ -31,26 +31,20 @@ git clone https://github.com/murrain/kde-weather-widget.git
 cd kde-weather-widget
 ```
 
-**2. Install the widget package**
-
-```sh
-kpackagetool6 --install com.weatherstation.local
-```
-
-**3. Sync files to the Plasma plasmoids directory**
+**2. Copy the widget into Plasma's plasmoids directory**
 
 ```sh
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
 ```
 
-**4. Restart Plasma**
+**3. Restart Plasma**
 
 ```sh
 plasmashell --replace &disown
 ```
 
-**5. Add the widget to your panel**
+**4. Add the widget to your panel**
 
 Right-click your panel → **Add Widgets** → search for **Weather Station** → drag it onto the panel.
 
@@ -88,7 +82,6 @@ Right-click the widget → **Configure**.
 After pulling new changes:
 
 ```sh
-kpackagetool6 --upgrade com.weatherstation.local
 rsync -a com.weatherstation.local/ ~/.local/share/plasma/plasmoids/com.weatherstation.local/
 kbuildsycoca6
 plasmashell --replace &disown
