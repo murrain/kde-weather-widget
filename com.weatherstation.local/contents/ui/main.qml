@@ -9,6 +9,7 @@ PlasmoidItem {
 
     // Shared state
     property var weatherData: null
+    property var lastUpdatedAt: null
     property string lastUpdated: ""
     property bool loading: false
     property string errorMsg: ""
@@ -44,6 +45,9 @@ PlasmoidItem {
             && weatherData.current.weather && weatherData.current.weather.length > 0)
         ? capitalize(weatherData.current.weather[0].description)
         : (loading ? "Loading…" : (errorMsg || "No data"))
+    readonly property bool use24HourTime: Plasmoid.configuration.use24HourTime === undefined
+        ? true
+        : Plasmoid.configuration.use24HourTime
 
     compactRepresentation: CompactRepresentation {}
     fullRepresentation: FullRepresentation {}
@@ -74,6 +78,9 @@ PlasmoidItem {
         function onLatitudeChanged() { clearWeatherGovCache(); fetchWeather() }
         function onLongitudeChanged() { clearWeatherGovCache(); fetchWeather() }
         function onLocationDisplayChanged() { fetchWeather() }
+        function onUse24HourTimeChanged() {
+            if (lastUpdatedAt) lastUpdated = formatUpdatedTime(lastUpdatedAt)
+        }
         function onUpdateIntervalChanged() {
             refreshTimer.interval = (Plasmoid.configuration.updateInterval || 5) * 60 * 1000
             refreshTimer.restart()
@@ -132,7 +139,8 @@ PlasmoidItem {
             }
             loading = false
             weatherData = normalized
-            lastUpdated = Qt.formatTime(new Date(), "h:mm AP")
+            lastUpdatedAt = new Date()
+            lastUpdated = formatUpdatedTime(lastUpdatedAt)
             errorMsg = ""
         }, function (msg) {
             loading = false
@@ -243,7 +251,8 @@ PlasmoidItem {
                 }
                 loading = false
                 weatherData = normalized
-                lastUpdated = Qt.formatTime(new Date(), "h:mm AP")
+                lastUpdatedAt = new Date()
+                lastUpdated = formatUpdatedTime(lastUpdatedAt)
                 errorMsg = ""
             }, function (msg) {
                 loading = false
@@ -255,6 +264,10 @@ PlasmoidItem {
             weatherData = null
             errorMsg = "weather.gov hourly forecast error: " + msg
         }, "weather.gov hourly")
+    }
+
+    function formatUpdatedTime(dateObj) {
+        return Qt.formatTime(dateObj, use24HourTime ? "HH:mm" : "h:mm AP")
     }
 
     function validateProviderConfig(provider) {

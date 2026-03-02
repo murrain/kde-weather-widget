@@ -18,6 +18,7 @@ Kirigami.FormLayout {
     property alias cfg_tempPrecision: precisionSpin.value
     property alias cfg_humidityPrecision: humidityPrecisionSpin.value
     property alias cfg_updateInterval: intervalSpin.value
+    property bool cfg_use24HourTime: true
     property alias cfg_debugLayout: debugSwitch.checked
 
     property var geocodeResults: []
@@ -55,6 +56,14 @@ Kirigami.FormLayout {
         cfg_apiPreset = providerIds[presetCombo.currentIndex]
     }
 
+    PlasmaComponents.Label {
+        Kirigami.FormData.label: ""
+        text: i18n("Provider")
+        font.weight: Font.DemiBold
+        opacity: 0.8
+        Layout.topMargin: Kirigami.Units.smallSpacing
+    }
+
     ComboBox {
         id: presetCombo
         Kirigami.FormData.label: i18n("API provider:")
@@ -88,27 +97,6 @@ Kirigami.FormLayout {
         placeholderText: "https://api.example.com/weather"
         Layout.minimumWidth: Kirigami.Units.gridUnit * 22
         visible: currentProvider && currentProvider.requiresEndpoint
-    }
-
-    RowLayout {
-        Kirigami.FormData.label: i18n("Connection test:")
-        spacing: Kirigami.Units.smallSpacing
-        visible: currentProvider !== null
-
-        Button {
-            text: providerTestRunning ? i18n("Testing…") : i18n("Test Provider")
-            enabled: !providerTestRunning
-            onClicked: doProviderTest()
-        }
-
-        PlasmaComponents.Label {
-            text: providerTestMessage
-            visible: providerTestMessage !== ""
-            color: providerTestSuccess ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
-            font.pointSize: Kirigami.Theme.smallFont.pointSize
-            Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-        }
     }
 
     RowLayout {
@@ -211,6 +199,50 @@ Kirigami.FormLayout {
         visible: currentProvider && currentProvider.requiresCoords && coordSwitch.checked
     }
 
+    RowLayout {
+        Kirigami.FormData.label: i18n("Connection test:")
+        spacing: Kirigami.Units.smallSpacing
+        visible: currentProvider !== null
+
+        Button {
+            text: providerTestRunning ? i18n("Testing…") : i18n("Test Provider")
+            enabled: !providerTestRunning
+            onClicked: doProviderTest()
+        }
+
+        PlasmaComponents.Label {
+            text: providerTestMessage
+            visible: providerTestMessage !== ""
+            color: providerTestSuccess ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+        }
+    }
+
+    Item {
+        Kirigami.FormData.label: ""
+        implicitHeight: Kirigami.Units.smallSpacing
+    }
+
+    Rectangle {
+        Kirigami.FormData.label: ""
+        Layout.fillWidth: true
+        Layout.topMargin: Kirigami.Units.smallSpacing
+        Layout.bottomMargin: Kirigami.Units.smallSpacing
+        height: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.14
+    }
+
+    PlasmaComponents.Label {
+        Kirigami.FormData.label: ""
+        text: i18n("Display")
+        font.weight: Font.DemiBold
+        opacity: 0.8
+        Layout.topMargin: Kirigami.Units.smallSpacing
+    }
+
     Switch {
         id: locationOverrideSwitch
         Kirigami.FormData.label: i18n("Override display name:")
@@ -226,11 +258,64 @@ Kirigami.FormLayout {
         visible: locationOverrideSwitch.checked
     }
 
+    Item {
+        Kirigami.FormData.label: ""
+        implicitHeight: Kirigami.Units.smallSpacing
+    }
+
+    Rectangle {
+        Kirigami.FormData.label: ""
+        Layout.fillWidth: true
+        Layout.topMargin: Kirigami.Units.smallSpacing
+        Layout.bottomMargin: Kirigami.Units.smallSpacing
+        height: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.14
+    }
+
+    PlasmaComponents.Label {
+        Kirigami.FormData.label: ""
+        text: i18n("Refresh & Time")
+        font.weight: Font.DemiBold
+        opacity: 0.8
+        Layout.topMargin: Kirigami.Units.smallSpacing
+    }
+
     SpinBox {
         id: intervalSpin
         Kirigami.FormData.label: i18n("Refresh interval (minutes):")
         from: 1
         to: 60
+    }
+
+    Switch {
+        id: use24HourSwitch
+        Kirigami.FormData.label: i18n("Use 24-hour time:")
+        checked: cfg_use24HourTime
+        onToggled: cfg_use24HourTime = checked
+    }
+
+    Item {
+        Kirigami.FormData.label: ""
+        implicitHeight: Kirigami.Units.smallSpacing
+    }
+
+    Rectangle {
+        Kirigami.FormData.label: ""
+        Layout.fillWidth: true
+        Layout.topMargin: Kirigami.Units.smallSpacing
+        Layout.bottomMargin: Kirigami.Units.smallSpacing
+        height: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.14
+    }
+
+    PlasmaComponents.Label {
+        Kirigami.FormData.label: ""
+        text: i18n("Precision")
+        font.weight: Font.DemiBold
+        opacity: 0.8
+        Layout.topMargin: Kirigami.Units.smallSpacing
     }
 
     SpinBox {
@@ -245,6 +330,29 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18n("Humidity decimal places:")
         from: 0
         to: 2
+    }
+
+    Item {
+        Kirigami.FormData.label: ""
+        implicitHeight: Kirigami.Units.smallSpacing
+    }
+
+    Rectangle {
+        Kirigami.FormData.label: ""
+        Layout.fillWidth: true
+        Layout.topMargin: Kirigami.Units.smallSpacing
+        Layout.bottomMargin: Kirigami.Units.smallSpacing
+        height: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.14
+    }
+
+    PlasmaComponents.Label {
+        Kirigami.FormData.label: ""
+        text: i18n("Advanced")
+        font.weight: Font.DemiBold
+        opacity: 0.8
+        Layout.topMargin: Kirigami.Units.smallSpacing
     }
 
     Switch {
