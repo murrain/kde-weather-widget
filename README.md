@@ -62,10 +62,11 @@ If Plasma doesn't pick up the update immediately, log out/in or restart `plasmas
 - **API provider**: Choose provider preset. `weather.gov` uses NWS public APIs via your selected coordinates.
 - **API key**: Shown only for providers that require a key.
 - **API endpoint**: Shown only for custom URL provider.
-- **Location search**: Available for providers that support geocoding.
+- **Location search**: Available for providers that support geocoding (set location before running provider test).
 - **Manual coordinates**: Set lat/lon directly.
 - **Override display name**: Optional popup header override.
 - **Refresh interval**: 1-60 minutes.
+- **Use 24-hour time**: Controls the "Updated" timestamp format (default: enabled).
 - **Temperature/Humidity decimal places**.
 - **Debug layout**: visual layout diagnostics.
 
